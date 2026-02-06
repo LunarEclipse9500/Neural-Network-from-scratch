@@ -20,8 +20,6 @@ class Neuron:
         return weights
     
 
-    
-
 class Network:
     def __init__(self, input_neurons:int, output_neurons:int):
         self.input_neurons=input_neurons
@@ -98,11 +96,44 @@ class Network:
         loss_list=[((actual_result[i]-predicted_result[i])**2) for i in range(0, len(actual_result))]
         return loss_list
     
-    def backprop_output_neurons(self, output_neurons, layer_inputs, raw_outputs, activated_outputs, actual_outputs, lr_weight=0.001, lr_bias=0.01):
-        for i in range(0, len(output_neurons)):
+    def backprop_output_neurons(self, output_layer_neurons, hidden_layer_2_outputs, raw_outputs, activated_outputs, actual_outputs, lr_weight=0.001, lr_bias=0.01):
+        global dl_dz_output_layer
+        dl_dz_output_layer=[]
+        for i in range(0, len(output_layer_neurons)):
             dl_dz=2*(activated_outputs[i]-actual_outputs[i])*self.relu_derivative(raw_outputs[i])
-            for j in range(0, len(output_neurons[i].weights)):
-                dz_dw=layer_inputs[j]
+            dl_dz_output_layer.append[dl_dz]
+            for j in range(0, len(output_layer_neurons[i].weights)):
+                dz_dw=hidden_layer_2_outputs[j]
                 dl_dw=dl_dz*dz_dw
-                output_neurons[i].weights[j]-=lr_weight*dl_dw
-            output_neurons[i].bias-=lr_bias*dl_dz
+                output_layer_neurons[i].weights[j]-=lr_weight*dl_dw
+            output_layer_neurons[i].bias-=lr_bias*dl_dz
+        
+    def backprop_hidden_layer_2(self, hidden_layer_2_neurons, output_layer_neurons, hidden_layer_1_outputs, raw_outputs, lr_weight=0.001, lr_bias=0.01):
+        global dl_dz_hidden_layer_2
+        dl_dz_hidden_layer_2=[]
+        for i in range(0, len(hidden_layer_2_neurons)):
+            dl_dz=0
+            for j in range(0, len(output_layer_neurons)):
+                dl_dz+=dl_dz_output_layer[j]*output_layer_neurons[j].weights[i]
+            dl_dz*=self.relu_derivative(raw_outputs[i])
+            dl_dz_hidden_layer_2.append(dl_dz)
+            for k in range(0, len(hidden_layer_2_neurons[i].weights)):
+                dz_dw=hidden_layer_1_outputs[k]
+                dl_dw=dl_dz*dz_dw
+                hidden_layer_2_neurons[i].weights[k]-=lr_weight*dl_dw
+            hidden_layer_2_neurons[i].bias-=lr_bias*dl_dz
+
+    def backprop_hidden_layer_1(self, hidden_layer_1_neurons, hidden_layer_2_neurons, inputs, raw_outputs, lr_weight=0.001, lr_bias=0.01):
+        global dl_dz_hidden_layer_1
+        dl_dz_hidden_layer_1=[]
+        for i in range(0, len(hidden_layer_1_neurons)):
+            dl_dz=0
+            for j in range(0, len(hidden_layer_2_neurons)):
+                dl_dz+=dl_dz_hidden_layer_1[j]*hidden_layer_2_neurons[j].weights[i]
+            dl_dz*=self.relu_derivative(raw_outputs[i])
+            dl_dz_hidden_layer_2.append(dl_dz)
+            for k in range(0, len(hidden_layer_1_neurons[i].weights)):
+                dz_dw=inputs[k]
+                dl_dw=dl_dz*dz_dw
+                hidden_layer_1_neurons[i].weights[k]-=lr_weight*dl_dw
+            hidden_layer_1_neurons[i].bias-=lr_bias*dl_dz
