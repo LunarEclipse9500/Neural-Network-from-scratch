@@ -18,7 +18,7 @@ class Neuron:
         for i in range(0, self.no_of_inputs):
             weights.append(random.uniform(-0.2, 0.2))
         return weights
-    
+
 
 class Network:
     def __init__(self, input_neurons:int, output_neurons:int):
@@ -32,7 +32,7 @@ class Network:
         output=max(0,input)
         return output
     
-    def relu_derivative(raw_output):
+    def relu_derivative(self, raw_output):
         derivative=0 if (raw_output<=0) else 1
         return derivative
     
@@ -101,7 +101,7 @@ class Network:
         dl_dz_output_layer=[]
         for i in range(0, len(output_layer_neurons)):
             dl_dz=2*(activated_outputs[i]-actual_outputs[i])*self.relu_derivative(raw_outputs[i])
-            dl_dz_output_layer.append[dl_dz]
+            dl_dz_output_layer.append(dl_dz)
             for j in range(0, len(output_layer_neurons[i].weights)):
                 dz_dw=hidden_layer_2_outputs[j]
                 dl_dw=dl_dz*dz_dw
@@ -129,9 +129,9 @@ class Network:
         for i in range(0, len(hidden_layer_1_neurons)):
             dl_dz=0
             for j in range(0, len(hidden_layer_2_neurons)):
-                dl_dz+=dl_dz_hidden_layer_1[j]*hidden_layer_2_neurons[j].weights[i]
+                dl_dz+=dl_dz_hidden_layer_2[j]*hidden_layer_2_neurons[j].weights[i]
             dl_dz*=self.relu_derivative(raw_outputs[i])
-            dl_dz_hidden_layer_2.append(dl_dz)
+            dl_dz_hidden_layer_1.append(dl_dz)
             for k in range(0, len(hidden_layer_1_neurons[i].weights)):
                 dz_dw=inputs[k]
                 dl_dw=dl_dz*dz_dw
